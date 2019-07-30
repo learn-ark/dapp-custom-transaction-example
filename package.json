@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@arkecosystem/custom-transaction",
+  "name": "@arkecosystem/custom-transactions",
   "description": "Provides ... for Ark Core",
   "version": "0.0.1",
   "contributors": [

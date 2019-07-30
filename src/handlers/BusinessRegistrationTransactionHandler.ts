@@ -2,7 +2,7 @@ import { Database, EventEmitter, State, TransactionPool } from "@arkecosystem/co
 import { Handlers } from "@arkecosystem/core-transactions";
 import { Interfaces, Transactions } from "@arkecosystem/crypto";
 import { BusinessRegistrationAssetError, WalletIsAlreadyABusiness } from "../errors";
-import { BusinessRegistrationTransaction } from "../transaction";
+import { BusinessRegistrationTransaction } from "../transactions";
 
 export class BusinessRegistrationTransactionHandler extends Handlers.TransactionHandler {
   public getConstructor(): Transactions.TransactionConstructor {

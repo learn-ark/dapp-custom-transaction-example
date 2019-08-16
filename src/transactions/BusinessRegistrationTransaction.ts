@@ -7,6 +7,7 @@ const { schemas } = Transactions;
 const BUSINESS_REGISTRATION_TYPE = 100;
 
 export class BusinessRegistrationTransaction extends Transactions.Transaction {
+  public static typeGroup = 1;
   public static type = BUSINESS_REGISTRATION_TYPE;
   public static key: string = "businessRegistration";
   protected static defaultStaticFee: Utils.BigNumber = Utils.BigNumber.make("5000000000");

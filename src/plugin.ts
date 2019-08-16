@@ -10,9 +10,9 @@ export const plugin: Container.IPluginDescriptor = {
   async register(container: Container.IContainer, options) {
     container.resolvePlugin<Logger.ILogger>("logger").info("Registering custom transaction");
     Handlers.Registry.registerTransactionHandler(BusinessRegistrationTransactionHandler);
+
   },
   async deregister(container: Container.IContainer, options) {
     container.resolvePlugin<Logger.ILogger>("logger").info("Deregistering custom transaction");
-    Handlers.Registry.deregisterTransactionHandler(BusinessRegistrationTransactionHandler);
   }
 };

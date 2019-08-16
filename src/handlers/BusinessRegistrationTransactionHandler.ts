@@ -1,7 +1,8 @@
 import { Database, EventEmitter, State, TransactionPool } from "@arkecosystem/core-interfaces";
 import { Handlers } from "@arkecosystem/core-transactions";
-import { Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
+import { Interfaces, Transactions } from "@arkecosystem/crypto";
 import { BusinessRegistrationAssetError, WalletIsAlreadyABusiness } from "../errors";
+import { IBusinessRegistrationAsset } from "../interfaces";
 import { BusinessRegistrationTransaction } from "../transactions";
 
 export class BusinessRegistrationTransactionHandler extends Handlers.TransactionHandler {
@@ -17,13 +18,13 @@ export class BusinessRegistrationTransactionHandler extends Handlers.Transaction
     }
 
     public async isActivated(): Promise<boolean> {
-        return !!Managers.configManager.getMilestone().aip11;
+        return true;
     }
   public async bootstrap(connection: Database.IConnection, walletManager: State.IWalletManager): Promise<void> {
     const transactions = await connection.transactionsRepository.getAssetsByType(this.getConstructor().type);
     for (const transaction of transactions) {
       const wallet = walletManager.findByPublicKey(transaction.senderPublicKey);
-      wallet.setAttribute("business", transaction.asset.businessRegistration);
+      wallet.setAttribute<IBusinessRegistrationAsset>("business", transaction.asset.businessRegistration);
       walletManager.reindex(wallet);
     }
   }
@@ -91,7 +92,7 @@ export class BusinessRegistrationTransactionHandler extends Handlers.Transaction
   public async applyToSender(transaction: Interfaces.ITransaction, walletManager: State.IWalletManager): Promise<void> {
     await super.applyToSender(transaction, walletManager);
     const sender: State.IWallet = walletManager.findByPublicKey(transaction.data.senderPublicKey);
-    sender.setAttribute("business", transaction.data.asset.businessRegistration);
+    sender.setAttribute<IBusinessRegistrationAsset>("business", transaction.data.asset.businessRegistration);
     walletManager.reindex(sender);
   }
 

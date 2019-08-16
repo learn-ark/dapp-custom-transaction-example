@@ -13,8 +13,8 @@ Adding it to plugins.js (mainnet,devnet,testnet)
 ```bash
 cd packages/core/bin/config/testnet
 ```
-Adding:
+Add:
 
 ```json
-"custom-transactions": {},
+"@arkecosystem/custom-transactions": {},
 ```

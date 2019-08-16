@@ -4,6 +4,7 @@ export class BusinessRegistrationBuilder extends Transactions.TransactionBuilder
   constructor() {
     super();
     this.data.type = 100;
+    this.data.typeGroup = 1001;
     this.data.fee = Utils.BigNumber.make("5000000000");
     this.data.amount = Utils.BigNumber.ZERO;
     this.data.asset = { businessRegistration: {} };

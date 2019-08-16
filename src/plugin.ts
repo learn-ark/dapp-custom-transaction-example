@@ -9,10 +9,10 @@ export const plugin: Container.IPluginDescriptor = {
   alias: "my-custom-transactions",
   async register(container: Container.IContainer, options) {
     container.resolvePlugin<Logger.ILogger>("logger").info("Registering custom transaction");
-    Handlers.Registry.registerCustomTransactionHandler(BusinessRegistrationTransactionHandler);
+    Handlers.Registry.registerTransactionHandler(BusinessRegistrationTransactionHandler);
   },
   async deregister(container: Container.IContainer, options) {
     container.resolvePlugin<Logger.ILogger>("logger").info("Deregistering custom transaction");
-    Handlers.Registry.deregisterCustomTransactionHandler(BusinessRegistrationTransactionHandler);
+    Handlers.Registry.deregisterTransactionHandler(BusinessRegistrationTransactionHandler);
   }
 };

@@ -1,6 +1,6 @@
 import { Database, EventEmitter, State, TransactionPool } from "@arkecosystem/core-interfaces";
 import { Handlers } from "@arkecosystem/core-transactions";
-import { Interfaces, Transactions } from "@arkecosystem/crypto";
+import { Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
 import { BusinessRegistrationAssetError, WalletIsAlreadyABusiness } from "../errors";
 import { BusinessRegistrationTransaction } from "../transactions";
 
@@ -8,7 +8,17 @@ export class BusinessRegistrationTransactionHandler extends Handlers.Transaction
   public getConstructor(): Transactions.TransactionConstructor {
     return BusinessRegistrationTransaction;
   }
+    public dependencies(): ReadonlyArray<any> {
+        return [];
+    }
 
+    public walletAttributes(): ReadonlyArray<string> {
+        return ["business"];
+    }
+
+    public async isActivated(): Promise<boolean> {
+        return !!Managers.configManager.getMilestone().aip11;
+    }
   public async bootstrap(connection: Database.IConnection, walletManager: State.IWalletManager): Promise<void> {
     const transactions = await connection.transactionsRepository.getAssetsByType(this.getConstructor().type);
     for (const transaction of transactions) {
@@ -18,11 +28,11 @@ export class BusinessRegistrationTransactionHandler extends Handlers.Transaction
     }
   }
 
-  public throwIfCannotBeApplied(
+  public async throwIfCannotBeApplied(
     transaction: Interfaces.ITransaction,
     wallet: State.IWallet,
     databaseWalletManager: State.IWalletManager,
-  ): void {
+  ): Promise<void> {
     const { data }: Interfaces.ITransaction = transaction;
 
     const { name, website }: { name: string; website: string } = data.asset.businessRegistration;
@@ -41,11 +51,11 @@ export class BusinessRegistrationTransactionHandler extends Handlers.Transaction
     emitter.emit("business.registered", transaction.data);
   }
 
-  public canEnterTransactionPool(
+  public async canEnterTransactionPool(
     data: Interfaces.ITransactionData,
     pool: TransactionPool.IConnection,
     processor: TransactionPool.IProcessor,
-  ): boolean {
+  ): Promise<boolean> {
     if (this.typeFromSenderAlreadyInPool(data, pool, processor)) {
       return false;
     }
@@ -65,7 +75,7 @@ export class BusinessRegistrationTransactionHandler extends Handlers.Transaction
     }
 
     const businessRegistrationsInPool: Interfaces.ITransactionData[] = Array.from(
-      pool.getTransactionsByType(this.getConstructor().type),
+      await pool.getTransactionsByType(this.getConstructor().type),
     ).map((memTx: Interfaces.ITransaction) => memTx.data);
     const containsBusinessRegistrationForSameNameInPool: boolean = businessRegistrationsInPool.some(
       transaction => transaction.asset.businessRegistration.name === name,
@@ -78,25 +88,25 @@ export class BusinessRegistrationTransactionHandler extends Handlers.Transaction
     return true;
   }
 
-  public applyToSender(transaction: Interfaces.ITransaction, walletManager: State.IWalletManager): void {
-    super.applyToSender(transaction, walletManager);
+  public async applyToSender(transaction: Interfaces.ITransaction, walletManager: State.IWalletManager): Promise<void> {
+    await super.applyToSender(transaction, walletManager);
     const sender: State.IWallet = walletManager.findByPublicKey(transaction.data.senderPublicKey);
     sender.setAttribute("business", transaction.data.asset.businessRegistration);
     walletManager.reindex(sender);
   }
 
-  public revertForSender(transaction: Interfaces.ITransaction, walletManager: State.IWalletManager): void {
-    super.revertForSender(transaction, walletManager);
+  public async revertForSender(transaction: Interfaces.ITransaction, walletManager: State.IWalletManager): Promise<void> {
+    await super.revertForSender(transaction, walletManager);
     const sender: State.IWallet = walletManager.findByPublicKey(transaction.data.senderPublicKey);
     sender.forgetAttribute("business");
     walletManager.reindex(sender);
   }
 
-  public applyToRecipient(transaction: Interfaces.ITransaction, walletManager: State.IWalletManager): void {
+  public async applyToRecipient(transaction: Interfaces.ITransaction, walletManager: State.IWalletManager): Promise<void> {
     return;
   }
 
-  public revertForRecipient(transaction: Interfaces.ITransaction, walletManager: State.IWalletManager): void {
+  public async revertForRecipient(transaction: Interfaces.ITransaction, walletManager: State.IWalletManager): Promise<void> {
     return;
   }
 }

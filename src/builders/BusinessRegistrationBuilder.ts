@@ -1,10 +1,11 @@
 import { Interfaces, Transactions, Utils } from "@arkecosystem/crypto";
+import { BusinessRegistrationTransaction } from "../transactions";
 
 export class BusinessRegistrationBuilder extends Transactions.TransactionBuilder<BusinessRegistrationBuilder> {
   constructor() {
     super();
-    this.data.type = 100;
-    this.data.typeGroup = 1;
+    this.data.type = BusinessRegistrationTransaction.type;
+    this.data.typeGroup = BusinessRegistrationTransaction.typeGroup;
     this.data.version = 2;
     this.data.fee = Utils.BigNumber.make("5000000000");
     this.data.amount = Utils.BigNumber.ZERO;

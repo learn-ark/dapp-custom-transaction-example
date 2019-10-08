@@ -7,17 +7,17 @@ const { schemas } = Transactions;
 const BUSINESS_REGISTRATION_TYPE = 100;
 
 export class BusinessRegistrationTransaction extends Transactions.Transaction {
-  public static typeGroup = 1;
-  public static type = BUSINESS_REGISTRATION_TYPE;
-  public static key: string = "businessRegistration";
-  protected static defaultStaticFee: Utils.BigNumber = Utils.BigNumber.make("5000000000");
+  public static typeGroup: number = 1;
+  public static type: number = BUSINESS_REGISTRATION_TYPE;
+  public static key: string = "businessRegistration2";
 
   public static getSchema(): Transactions.schemas.TransactionSchema {
     return schemas.extend(schemas.transactionBaseSchema, {
-      $id: "businessRegistration",
-      required: ["asset"],
+      $id: "businessRegistration2",
+      required: ["asset", "typeGroup"],
       properties: {
         type: { transactionType: BUSINESS_REGISTRATION_TYPE },
+        typeGroup: { const: 1 },
         amount: { bignumber: { minimum: 0, maximum: 0 } },
         asset: {
           type: "object",
@@ -44,6 +44,8 @@ export class BusinessRegistrationTransaction extends Transactions.Transaction {
       },
     });
   }
+
+  protected static defaultStaticFee: Utils.BigNumber = Utils.BigNumber.make("5000000000");
 
   public serialize(): ByteBuffer {
     const { data } = this;

@@ -1,6 +1,6 @@
 import { Database, EventEmitter, State, TransactionPool } from "@arkecosystem/core-interfaces";
-import { Handlers } from "@arkecosystem/core-transactions";
-import { Interfaces, Transactions } from "@arkecosystem/crypto";
+import { Handlers, TransactionReader } from "@arkecosystem/core-transactions";
+import { Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
 import { BusinessRegistrationAssetError, WalletIsAlreadyABusiness } from "../errors";
 import { IBusinessRegistrationAsset } from "../interfaces";
 import { BusinessRegistrationTransaction } from "../transactions";
@@ -9,24 +9,34 @@ export class BusinessRegistrationTransactionHandler extends Handlers.Transaction
   public getConstructor(): Transactions.TransactionConstructor {
     return BusinessRegistrationTransaction;
   }
-    public dependencies(): ReadonlyArray<any> {
+    public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
         return [];
     }
 
     public walletAttributes(): ReadonlyArray<string> {
-        return ["business"];
+        return [];
     }
 
     public async isActivated(): Promise<boolean> {
-        return true;
+        return !!Managers.configManager.getMilestone().aip11;
     }
   public async bootstrap(connection: Database.IConnection, walletManager: State.IWalletManager): Promise<void> {
-    const transactions = await connection.transactionsRepository.getAssetsByType(this.getConstructor().type);
-    for (const transaction of transactions) {
-      const wallet = walletManager.findByPublicKey(transaction.senderPublicKey);
-      wallet.setAttribute<IBusinessRegistrationAsset>("business", transaction.asset.businessRegistration);
-      walletManager.reindex(wallet);
-    }
+      const reader: TransactionReader = await TransactionReader.create(connection, this.getConstructor());
+
+      while (reader.hasNext()) {
+          const transactions = await reader.read();
+
+          for (const transaction of transactions) {
+              const wallet: State.IWallet = walletManager.findByPublicKey(transaction.senderPublicKey);
+              const asset: IBusinessRegistrationAsset = {
+                  name: transaction.asset.businessRegistration.name,
+                  website: transaction.asset.businessRegistration.website
+              };
+
+              wallet.setAttribute<IBusinessRegistrationAsset>("business", asset);
+              walletManager.reindex(wallet);
+          }
+      }
   }
 
   public async throwIfCannotBeApplied(

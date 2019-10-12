@@ -28,9 +28,12 @@
     "updates": "../../node_modules/npm-check-updates/bin/npm-check-updates -a"
   },
   "dependencies": {
-    "@arkecosystem/core-interfaces": "^2.5.0-next.10",
-    "@arkecosystem/core-transactions": "^2.5.0-next.10",
-    "@arkecosystem/core-utils": "^2.5.0-next.10",
+      "@arkecosystem/core-container": "^2.5.0-next.10",
+      "@arkecosystem/core-event-emitter": "^2.5.0-next.10",
+      "@arkecosystem/core-interfaces": "^2.5.0-next.10",
+      "@arkecosystem/core-state": "^2.5.0-next.10",
+      "@arkecosystem/core-transactions": "^2.5.0-next.10",
+      "@arkecosystem/crypto": "^2.5.0-next.10",
     "bytebuffer": "^5.0.1"
   },
   "devDependencies": {

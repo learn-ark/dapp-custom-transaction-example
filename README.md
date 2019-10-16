@@ -23,28 +23,28 @@ Curl example:
 
 ```bash
 curl -X POST \
-    http://127.0.0.1:4003/api/v2/transactions \
+    http://127.0.0.1:4003/api/transactions \
     -H 'Content-Type: application/json' \
     -d '{
     "transactions": [
-    {     
-        "id": "db8a9c8e7914bbef72515eaeb24a8d8052891c0dcdda3ee46d1045d714327c80",
-        "signature": "9f2ca69de1b282dbd40edad8cd4c6c4be609c224f885fd5446358bb9d0602452a1ab9866c9755985f2be90c065bcfa767cc63bd10152040e227f4298dab17dba",
-        "version": 2,
-        "type": 100,
-        "fee": 100,
-        "senderPublicKey":
-        "03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37",
-        "nonce": 3,
-        "amount": 0,
-        "asset":
-            { 
-                "businessRegistration": { 
-                                             "name": "google",
-                                             "website": "www.google.com"
-                                        } 
-            } 
-    }
+        {
+            "version": 2,
+            "network": 23,
+            "typeGroup": 1001,
+            "type": 100,
+            "nonce": "3",
+            "senderPublicKey": "03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37",
+            "fee": "5000000000",
+            "amount": "0",
+            "asset": {
+                "businessRegistration": {
+                    "name": "google",
+                    "website": "www.google.com"
+                }
+            },
+            "signature": "809dac6e3077d6ae2083b353b6020badc37195c286079d466bb1d6670ed4e9628a5b5d0a621801e2763aae5add41905036ed8d21609ed9ddde9f941bd066833c",
+            "id": "b567325019edeef0ce5a1134af0b642a54ed2a8266a406e1a999f5d590eb5c3c"
+        }
   ]
 }'
 ```

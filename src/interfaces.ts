@@ -1,4 +1,4 @@
-export interface IBusinessRegistrationAsset {
+export interface IBusinessData {
   name: string;
   website: string;
 }

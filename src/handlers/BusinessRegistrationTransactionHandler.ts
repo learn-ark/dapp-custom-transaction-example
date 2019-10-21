@@ -1,6 +1,6 @@
 import { Database, EventEmitter, State, TransactionPool } from "@arkecosystem/core-interfaces";
 import { Handlers, TransactionReader } from "@arkecosystem/core-transactions";
-import { Interfaces, Transactions } from "@arkecosystem/crypto";
+import { Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
 import { BusinessRegistrationAssetError, WalletIsAlreadyABusiness } from "../errors";
 import { IBusinessData } from "../interfaces";
 import { BusinessRegistrationTransaction } from "../transactions";
@@ -16,13 +16,12 @@ export class BusinessRegistrationTransactionHandler extends Handlers.Transaction
 
     public walletAttributes(): ReadonlyArray<string> {
             return [
-                "business_key",
+                "transactionWalletKeyName",
             ];
     }
 
     public async isActivated(): Promise<boolean> {
-        // return Managers.configManager.getMilestone().aip11 === true;
-        return true;
+        return Managers.configManager.getMilestone().aip11 === true;
     }
 
     public async bootstrap(connection: Database.IConnection, walletManager: State.IWalletManager): Promise<void> {
@@ -38,7 +37,7 @@ export class BusinessRegistrationTransactionHandler extends Handlers.Transaction
                     website: transaction.asset.businessData.website,
                 };
 
-                wallet.setAttribute<IBusinessData>("business_key", asset);
+                wallet.setAttribute<IBusinessData>("transactionWalletKeyName", asset);
                 walletManager.reindex(wallet);
             }
         }
@@ -56,7 +55,7 @@ export class BusinessRegistrationTransactionHandler extends Handlers.Transaction
             throw new BusinessRegistrationAssetError();
         }
 
-        if (wallet.hasAttribute("business_key")) {
+        if (wallet.hasAttribute("transactionWalletKeyName")) {
             throw new WalletIsAlreadyABusiness();
         }
 
@@ -110,7 +109,7 @@ export class BusinessRegistrationTransactionHandler extends Handlers.Transaction
     ): Promise<void> {
         await super.applyToSender(transaction, walletManager);
         const sender: State.IWallet = walletManager.findByPublicKey(transaction.data.senderPublicKey);
-        sender.setAttribute<IBusinessData>("business_key", transaction.data.asset.businessData);
+        sender.setAttribute<IBusinessData>("transactionWalletKeyName", transaction.data.asset.businessData);
         walletManager.reindex(sender);
     }
 
@@ -120,7 +119,7 @@ export class BusinessRegistrationTransactionHandler extends Handlers.Transaction
     ): Promise<void> {
         await super.revertForSender(transaction, walletManager);
         const sender: State.IWallet = walletManager.findByPublicKey(transaction.data.senderPublicKey);
-        sender.forgetAttribute("business_key");
+        sender.forgetAttribute("transactionWalletKeyName");
         walletManager.reindex(sender);
     }
 

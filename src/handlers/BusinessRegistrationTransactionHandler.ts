@@ -15,7 +15,9 @@ export class BusinessRegistrationTransactionHandler extends Handlers.Transaction
     }
 
     public walletAttributes(): ReadonlyArray<string> {
-        return [];
+            return [
+                "business_key",
+            ];
     }
 
     public async isActivated(): Promise<boolean> {

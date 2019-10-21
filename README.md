@@ -1,13 +1,25 @@
 # ARK Core - dApp Installation Setup Steps
 
-This is a basic example of Ark dApp development, by using our CustomTransaction approach with GTI.
+This is a basic example of Ark dApp development, by using our CustomTransaction approach with GTI and are modular approach.
 > This Example is currently operational only on our `core/develop` branch!
 
+This dApp enables a new transaction type on the ARK Core blockchain. New transaction types follows existing blockchain protocol. 
+### Specification:
+
+Purpose: Enables registration of a new business identity on the Core blockchain (with custom fields like name and website).
+
+TransactionType: `BusinessRegistration`
+Fields: 
+- name: string
+- website: string | uri
+
+Registered Transaction is fully compatible with existing [API (api/transactions/)](https://api.ark.dev/public-rest-api/endpoints/transactions) 
+
 ## dApp Installation
-### STEP 1: Checkout Custom Transaction As a GitSubmodule
+### STEP 1: Checkout This dApp Project As a GitSubmodule
 
 ```bash
-cd plugins/
+cd plugins/ #location for loading of custom non-core dApps
 git submodule add -f https://github.com/KovacZan/custom-transaction
 cd custom-transaction
 ```
@@ -23,7 +35,7 @@ cd packages/core/bin/config/testnet
 Locate file `plugins.js`. We will add our plugin name to end of the list of the loaded plugins. This means that core will pickup the plugin/dapp and load it for a specific network configuration
 Add line `"@arkecosystem/custom-transactions": {}`: to the end of the `plugins.js` file, so it looks something like this:
 
-```json
+```javascript
     "@arkecosystem/core-exchange-json-rpc": {
         enabled: process.env.CORE_EXCHANGE_JSON_RPC_ENABLED,
         host: process.env.CORE_EXCHANGE_JSON_RPC_HOST || "0.0.0.0",
@@ -35,10 +47,9 @@ Add line `"@arkecosystem/custom-transactions": {}`: to the end of the `plugins.j
     "@arkecosystem/custom-transactions": {}, //our application hook (here we load the plugin/dapp)
 ```
 
-### STEP 3: Setup Dev Docker DB
+### STEP 3: Setup Development Docker Database
 Setup docker database config and run Postgres DB via Docker. Follow the steps from here: 
 https://learn.ark.dev/core-getting-started/spinning-up-your-first-testnet#step-1-start-docker-testnet-database
-
 
 ### STEP 4: Start Local Testnet Blockchain
 Start local blockchain with testnet running on your developer computer. Follow steps defined in here:
@@ -122,6 +133,8 @@ Time: 6973ms
 ```
 
 Head over to http://localhost:8080/ to view contents of local running blockchain with Testnet environment setup.
+
+---
 
 
 Congrats, your dapp is loaded. Now look at the resources below to understand more about our dapp development.

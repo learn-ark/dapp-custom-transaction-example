@@ -1,6 +1,6 @@
 # ARK Core - dApp Installation Setup Steps
 
-This is a basic example of Ark dApp development, by using our CustomTransaction approach with GTI and are modular approach.
+This is a basic example of Ark dApp development, by using our CustomTransaction approach with GTI and modular approach.
 > This Example is currently operational only on our `core/develop` branch!
 
 This dApp enables a new transaction type on the ARK Core blockchain. New transaction types follows existing blockchain protocol. 

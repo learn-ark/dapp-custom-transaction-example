@@ -24,8 +24,8 @@ Registered Transaction is fully compatible with existing [API (api/transactions/
 
 ```bash
 cd plugins/ #location for loading of custom non-core dApps
-git submodule add -f https://github.com/KovacZan/custom-transaction
-cd custom-transaction
+git submodule add -f https://github.com/learn-ark/dapp-custom-transaction-example
+cd dapp-custom-transaction-example
 ```
 
 ### STEP 2: Load The dApp(Custom Transactions module) In The Corresponding Network Configurations.
@@ -110,19 +110,18 @@ You should receive a response similar to this:
 The following code instructions will run a local copy of ARK Explorer and connect to local node.
 
 ```bash
-    git clone https://github.com/arkecosystem/explorer
-    cd explorer
+git clone https://github.com/arkecosystem/explorer
+cd explorer
 
-    yarn install
+yarn install
 
-    yarn serve:testnet
-
+yarn serve:testnet
 ```
 
 After running `yarn serve:testnet` you should see the following:
 
 ```bash
- DONE  Compiled successfully in 11030ms                                                                                                        11:07:14 AM
+DONE  Compiled successfully in 11030ms                                                                                                        11:07:14 AM
 
 No type errors found
 Version: typescript 3.6.3

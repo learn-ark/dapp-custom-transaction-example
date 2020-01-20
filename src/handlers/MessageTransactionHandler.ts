@@ -1,8 +1,7 @@
 import { Database, EventEmitter, State, TransactionPool } from "@arkecosystem/core-interfaces";
-import { Handlers, TransactionReader } from "@arkecosystem/core-transactions";
-import { Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
+import { Handlers } from "@arkecosystem/core-transactions";
+import { Interfaces, Transactions } from "@arkecosystem/crypto";
 import { EmptyMessageAssetError, MessageTooLongError } from "../errors";
-import { IMessageData } from "../interfaces";
 import { MessageTransaction } from "../transactions";
 
 export class MessageTransactionHandler extends Handlers.TransactionHandler {

@@ -6,7 +6,7 @@ import { MessageTransactionHandler } from "./handlers";
 export const plugin: Container.IPluginDescriptor = {
     pkg: require("../package.json"),
     defaults,
-    alias: "my-custom-transactions",
+    alias: "message-transactions",
     async register(container: Container.IContainer, options) {
         container.resolvePlugin<Logger.ILogger>("logger").info("Registering custom transaction");
         Handlers.Registry.registerTransactionHandler(MessageTransactionHandler);

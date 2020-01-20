@@ -1,1 +1,1 @@
-export * from "./BusinessRegistrationBuilder";
+export * from "./MessageTransactionBuilder";

@@ -1,1 +1,1 @@
-export * from "./BusinessRegistrationTransactionHandler";
+export * from "./MessageTransactionHandler";

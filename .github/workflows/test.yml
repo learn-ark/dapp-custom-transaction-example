@@ -17,12 +17,6 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-            - name: Cache node modules
-              uses: actions/cache@v1
-              with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-node-
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
@@ -51,7 +45,7 @@ jobs:
               with:
                   find: "\"@arkecosystem/core-snapshots\": {},"
                   replace: "\"@arkecosystem/core-snapshots\": {}, \"@arkecosystem/custom-transactions\": {},"
-                  include: "__tests__/e2e/lib/config/nodes/**/plugins.js"
+                  include: "__tests__/e2e/lib/config/nodes/.*/plugins.js"
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:

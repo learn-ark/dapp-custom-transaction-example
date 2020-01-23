@@ -40,18 +40,18 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-                with:
-                    repository: ArkEcosystem/core
-                    ref: develop
+              with:
+                  repository: ArkEcosystem/core
+                  ref: develop
             - uses: actions/checkout@v2
-                with:
-                    path: plugins/dapp-custom-transaction-example
+              with:
+                  path: plugins/dapp-custom-transaction-example
             - name: Find and Replace
-                uses: jacobtomlinson/gha-find-replace@master
-                with:
-                    find: "\"@arkecosystem/core-snapshots\": {},"
-                    replace: "\"@arkecosystem/core-snapshots\": {}, \"@arkecosystem/custom-transactions\": {},"
-                    include: "__tests__/e2e/lib/config/nodes/**/plugins.js"
+              uses: jacobtomlinson/gha-find-replace@master
+              with:
+                  find: "\"@arkecosystem/core-snapshots\": {},"
+                  replace: "\"@arkecosystem/core-snapshots\": {}, \"@arkecosystem/custom-transactions\": {},"
+                  include: "__tests__/e2e/lib/config/nodes/**/plugins.js"
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:

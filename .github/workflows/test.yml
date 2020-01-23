@@ -1,0 +1,66 @@
+name: Test
+
+on:
+    push:
+        branches:
+            - "master"
+    pull_request:
+        types: [ready_for_review, synchronize, opened]
+
+jobs:
+    unit:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [12.x]
+
+        steps:
+            - uses: actions/checkout@v2
+            - name: Cache node modules
+              uses: actions/cache@v1
+              with:
+                  path: node_modules
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: ${{ runner.os }}-node-
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+            - name: Test
+              run: yarn test:unit
+
+    
+    e2e:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [12.x]
+
+        steps:
+            - uses: actions/checkout@v2
+                with:
+                    repository: ArkEcosystem/core
+                    ref: develop
+            - uses: actions/checkout@v2
+                with:
+                    path: plugins/dapp-custom-transaction-example
+            - name: Find and Replace
+                uses: jacobtomlinson/gha-find-replace@master
+                with:
+                    find: "\"@arkecosystem/core-snapshots\": {},"
+                    replace: "\"@arkecosystem/core-snapshots\": {}, \"@arkecosystem/custom-transactions\": {},"
+                    include: "__tests__/e2e/lib/config/nodes/**/plugins.js"
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+            - name: Install and build packages
+              run: yarn setup && cd __tests__/e2e && ../../node_modules/.bin/tsc && yarn cache clean && yarn install --frozen-lockfile
+            - name: Docker compose up
+              run: cd __tests__/e2e/lib/config && docker-compose up -d
+            - name: Wait 60 sec for docker containers to be up and nodes be running
+              run: sleep 60
+            - name: Run tests
+              run: 'cd plugins/dapp-custom-transaction-example && yarn test:e2e'

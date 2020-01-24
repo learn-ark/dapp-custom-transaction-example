@@ -1,8 +1,8 @@
 import "jest-extended";
 
-import { Managers, Transactions, Identities } from "@arkecosystem/crypto";
-import { BusinessRegistrationBuilder } from "../src/builders";
-import { BusinessRegistrationTransaction } from "../src/transactions";
+import { Managers, Transactions } from "@arkecosystem/crypto";
+import { BusinessRegistrationBuilder } from "../../src/builders";
+import { BusinessRegistrationTransaction } from "../../src/transactions";
 
 describe("Test builder",()=>{
     it("Should verify correctly", ()=> {

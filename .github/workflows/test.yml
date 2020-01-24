@@ -66,7 +66,9 @@ jobs:
               if: failure()
               uses: JasonEtco/create-an-issue@master
               env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  filename: plugins/dapp-custom-transaction-example/.github/ISSUE_TEMPLATE.md
             - name: Output results - node0
               if: always()
               run: docker logs config_core0_1

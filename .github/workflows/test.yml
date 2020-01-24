@@ -6,6 +6,8 @@ on:
             - "master"
     pull_request:
         types: [ready_for_review, synchronize, opened]
+    schedule:
+        - cron: '0 1 * * *'
 
 jobs:
     unit:

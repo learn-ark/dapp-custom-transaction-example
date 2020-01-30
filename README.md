@@ -1,3 +1,5 @@
+![Test](https://github.com/learn-ark/dapp-custom-transaction-example/workflows/Test/badge.svg)
+
 # ARK Core - dApp Installation Setup Steps
 
 This is a basic example of Ark dApp development, by using our CustomTransaction approach with GTI and modular approach.

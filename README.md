@@ -1,3 +1,4 @@
+![Imgur](https://i.imgur.com/8wiwey2.jpg)
 ![Test](https://github.com/learn-ark/dapp-custom-transaction-example/workflows/Test/badge.svg)
 
 # ARK Core - dApp Installation Setup Steps

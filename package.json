@@ -30,19 +30,19 @@
     "updates": "../../node_modules/npm-check-updates/bin/npm-check-updates -a"
   },
   "dependencies": {
-      "@arkecosystem/core-container": "2.6.39",
-      "@arkecosystem/core-event-emitter": "2.6.39",
-      "@arkecosystem/core-interfaces": "2.6.39",
-      "@arkecosystem/core-state": "2.6.39",
-      "@arkecosystem/core-transactions": "2.6.39",
+      "@arkecosystem/core-container": "2.6.42",
+      "@arkecosystem/core-event-emitter": "2.6.42",
+      "@arkecosystem/core-interfaces": "2.6.42",
+      "@arkecosystem/core-state": "2.6.42",
+      "@arkecosystem/core-transactions": "2.6.42",
       "@arkecosystem/crypto": "2.6.42",
     "bytebuffer": "5.0.1"
   },
   "devDependencies": {
-    "@arkecosystem/core-utils": "2.6.39",
+    "@arkecosystem/core-utils": "2.6.42",
     "@sindresorhus/tsconfig": "0.7.0",
-    "@types/jest": "26.0.0",
-    "@types/node": "12.12.31",
+    "@types/jest": "26.0.1",
+    "@types/node": "12.12.47",
     "tslint": "6.1.2",
     "tslint-config-prettier": "1.18.0",
     "typescript": "3.9.5",

@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@arkecosystem/core-utils": "2.7.25",
-    "@sindresorhus/tsconfig": "0.7.0",
+    "@sindresorhus/tsconfig": "1.0.2",
     "@types/jest": "26.0.23",
     "@types/node": "12.12.47",
     "tslint": "6.1.3",

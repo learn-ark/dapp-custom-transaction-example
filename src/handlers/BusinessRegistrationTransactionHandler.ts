@@ -1,141 +1,113 @@
-import { Database, EventEmitter, State, TransactionPool } from "@arkecosystem/core-interfaces";
-import { Handlers, TransactionReader } from "@arkecosystem/core-transactions";
-import { Interfaces, Managers, Transactions } from "@arkecosystem/crypto";
-import { BusinessRegistrationAssetError, WalletIsAlreadyABusiness } from "../errors";
-import { IBusinessData } from "../interfaces";
+import { Container, Contracts, Utils } from "@arkecosystem/core-kernel";
+import { Handlers } from "@arkecosystem/core-transactions";
+import { Interfaces, Transactions } from "@arkecosystem/crypto";
+import { WalletIsAlreadyABusiness } from "../errors";
 import { BusinessRegistrationTransaction } from "../transactions";
 
 export class BusinessRegistrationTransactionHandler extends Handlers.TransactionHandler {
-    public getConstructor(): Transactions.TransactionConstructor {
-        return BusinessRegistrationTransaction;
+    @Container.inject(Container.Identifiers.TransactionPoolQuery)
+    private readonly poolQuery!: Contracts.TransactionPool.Query;
+
+    @Container.inject(Container.Identifiers.TransactionHistoryService)
+    private readonly transactionHistoryService!: Contracts.Shared.TransactionHistoryService;
+
+    public async isActivated(): Promise<boolean> {
+        return true;
     }
 
     public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
         return [];
     }
 
+    public getConstructor(): Transactions.TransactionConstructor {
+        return BusinessRegistrationTransaction;
+    }
+
     public walletAttributes(): ReadonlyArray<string> {
-            return [
-                "transactionWalletKeyName",
-            ];
+        return [
+            "business",
+            "business.businessAsset",
+        ];
     }
 
-    public async isActivated(): Promise<boolean> {
-        return Managers.configManager.getMilestone().aip11 === true;
-    }
+    public async bootstrap(): Promise<void> {
+        const criteria = {
+            typeGroup: this.getConstructor().typeGroup,
+            type: this.getConstructor().type,
+        };
 
-    public async bootstrap(connection: Database.IConnection, walletManager: State.IWalletManager): Promise<void> {
-        const reader: TransactionReader = await TransactionReader.create(connection, this.getConstructor());
+        for await (const transaction of this.transactionHistoryService.streamByCriteria(criteria)) {
+            const wallet: Contracts.State.Wallet = this.walletRepository.findByPublicKey(transaction.senderPublicKey);
+            const asset = {
+                businessAsset: transaction.asset.businessRegistration,
+            };
 
-        while (reader.hasNext()) {
-            const transactions = await reader.read();
-
-            for (const transaction of transactions) {
-                const wallet: State.IWallet = walletManager.findByPublicKey(transaction.senderPublicKey);
-                const asset: IBusinessData = {
-                    name: transaction.asset.businessData.name,
-                    website: transaction.asset.businessData.website,
-                };
-
-                wallet.setAttribute<IBusinessData>("transactionWalletKeyName", asset);
-                walletManager.reindex(wallet);
-            }
+            wallet.setAttribute("business", asset);
+            this.walletRepository.index(wallet);
         }
     }
 
     public async throwIfCannotBeApplied(
         transaction: Interfaces.ITransaction,
-        wallet: State.IWallet,
-        databaseWalletManager: State.IWalletManager,
+        wallet: Contracts.State.Wallet,
     ): Promise<void> {
-        const { data }: Interfaces.ITransaction = transaction;
-
-        const { name, website }: { name: string; website: string } = data.asset.businessData;
-        if (!name || !website) {
-            throw new BusinessRegistrationAssetError();
-        }
-
-        if (wallet.hasAttribute("transactionWalletKeyName")) {
+        if (wallet.hasAttribute("business")) {
             throw new WalletIsAlreadyABusiness();
         }
 
-        await super.throwIfCannotBeApplied(transaction, wallet, databaseWalletManager);
+        return super.throwIfCannotBeApplied(transaction, wallet);
     }
 
-    public emitEvents(transaction: Interfaces.ITransaction, emitter: EventEmitter.EventEmitter): void {
-        emitter.emit("business.registered", transaction.data);
+    public emitEvents(transaction: Interfaces.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
+        emitter.dispatch("business.registered", transaction.data);
     }
 
-    public async canEnterTransactionPool(
-        data: Interfaces.ITransactionData,
-        pool: TransactionPool.IConnection,
-        processor: TransactionPool.IProcessor,
-    ): Promise<{ type: string, message: string } | null>  {
+    public async throwIfCannotEnterPool(transaction: Interfaces.ITransaction): Promise<void> {
+        Utils.assert.defined<string>(transaction.data.senderPublicKey);
 
-        const err = await this.typeFromSenderAlreadyInPool(data, pool);
-        if (err !== null) {
-            return err;
+        const hasSender: boolean = this.poolQuery
+            .getAllBySender(transaction.data.senderPublicKey)
+            .whereKind(transaction)
+            .has();
+
+        if (hasSender) {
+            throw new Contracts.TransactionPool.PoolError(`Business registration already in the pool`, "ERR_PENDING");
         }
-
-        const { name }: { name: string } = data.asset.businessData;
-        const businessRegistrationsSameNameInPayload = processor
-            .getTransactions()
-            .filter(tx => tx.type === this.getConstructor().type && tx.asset.businessData.name === name);
-
-        if (businessRegistrationsSameNameInPayload.length > 1) {
-            return{
-                type: "ERR_CONFLICT",
-                message: `Multiple business registrations for "${name}" in transaction payload`,
-            };
-        }
-
-        const businessRegistrationsInPool: Interfaces.ITransactionData[] = Array.from(
-            await pool.getTransactionsByType(this.getConstructor().type),
-        ).map((memTx: Interfaces.ITransaction) => memTx.data);
-        const containsBusinessRegistrationForSameNameInPool: boolean = businessRegistrationsInPool.some(
-            transaction => transaction.asset.businessData.name === name,
-        );
-        if (containsBusinessRegistrationForSameNameInPool){
-            return {
-                type: "ERR_PENDING",
-                message: `Business registration for "${name}" already in the pool`,
-            }
-        }
-
-        return null;
     }
 
-    public async applyToSender(
-        transaction: Interfaces.ITransaction,
-        walletManager: State.IWalletManager,
-    ): Promise<void> {
-        await super.applyToSender(transaction, walletManager);
-        const sender: State.IWallet = walletManager.findByPublicKey(transaction.data.senderPublicKey);
-        sender.setAttribute<IBusinessData>("transactionWalletKeyName", transaction.data.asset.businessData);
-        walletManager.reindex(sender);
+    public async applyToSender(transaction: Interfaces.ITransaction): Promise<void> {
+        await super.applyToSender(transaction);
+
+        Utils.assert.defined<string>(transaction.data.senderPublicKey);
+
+        const sender: Contracts.State.Wallet = this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+
+        sender.setAttribute("business", {
+            businessAsset: transaction.data.asset.businessRegistration,
+        });
+
+        this.walletRepository.index(sender);
     }
 
-    public async revertForSender(
-        transaction: Interfaces.ITransaction,
-        walletManager: State.IWalletManager,
-    ): Promise<void> {
-        await super.revertForSender(transaction, walletManager);
-        const sender: State.IWallet = walletManager.findByPublicKey(transaction.data.senderPublicKey);
-        sender.forgetAttribute("transactionWalletKeyName");
-        walletManager.reindex(sender);
+    public async revertForSender(transaction: Interfaces.ITransaction): Promise<void> {
+        await super.revertForSender(transaction);
+
+        Utils.assert.defined<string>(transaction.data.senderPublicKey);
+
+        const sender: Contracts.State.Wallet = this.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+
+        sender.forgetAttribute("business");
+
+        this.walletRepository.index(sender);
     }
 
     public async applyToRecipient(
         transaction: Interfaces.ITransaction,
-        walletManager: State.IWalletManager,
-    ): Promise<void> {
-        return;
-    }
+        // tslint:disable-next-line: no-empty
+    ): Promise<void> {}
 
     public async revertForRecipient(
         transaction: Interfaces.ITransaction,
-        walletManager: State.IWalletManager,
-    ): Promise<void> {
-        return;
-    }
+        // tslint:disable-next-line:no-empty
+    ): Promise<void> {}
 }

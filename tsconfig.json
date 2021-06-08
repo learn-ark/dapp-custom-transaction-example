@@ -1,6 +1,7 @@
 {
     "extends": "@sindresorhus/tsconfig",
     "compilerOptions": {
+        "experimentalDecorators": true,
         "outDir": "dist",
         "alwaysStrict": false,
         "esModuleInterop": true,

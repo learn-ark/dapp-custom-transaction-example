@@ -47,7 +47,7 @@
     "tslint-config-prettier": "1.18.0",
     "typescript": "4.3.2",
     "typedoc": "0.20.36",
-    "ts-jest": "26.5.6",
+    "ts-jest": "27.0.3",
     "jest": "27.0.4",
     "jest-extended": "0.11.5",
     "regenerator-runtime": "0.13.7",

@@ -18,7 +18,7 @@ jobs:
                 node-version: [12.x]
 
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v2
               with:
@@ -37,11 +37,11 @@ jobs:
                 node-version: [12.x]
 
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
               with:
                   repository: ArkEcosystem/core
                   ref: master
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
               with:
                   path: plugins/dapp-custom-transaction-example
             - name: Find and Replace
